@@ -1,7 +1,7 @@
 import { gameServer } from '@/networking/GameServer';
 import { Player as EnginePlayer } from '../../../engine/components/Player';
 import { EntityId, ServerPlayer } from '../../../shared/types';
-import { BulletController } from './BulletController';
+import { ShootingController } from './ShootingController';
 import { MovementController } from './MovementController';
 import { MAP_HEIGHT_PX, MAP_WIDTH_PX } from '../../../shared/constants';
 import { GameEngine } from '../../../engine/GameEngine';
@@ -9,7 +9,7 @@ import { Container, Text } from 'pixi.js';
 import { DamageText } from '@/components/DamageText';
 
 export class Player extends EnginePlayer {
-  protected bulletController?: BulletController;
+  protected shootingController?: ShootingController;
   protected movementController?: MovementController;
   public spritesContainer = new Container();
   public isLocalPlayer;
@@ -36,7 +36,7 @@ export class Player extends EnginePlayer {
     this.isLocalPlayer = id === gameServer?.clientId;
 
     this.movementController = new MovementController(this);
-    this.bulletController = new BulletController(stage, this);
+    this.shootingController = new ShootingController(stage, this);
   }
 
   onHit(damage: number) {
@@ -52,7 +52,7 @@ export class Player extends EnginePlayer {
   }
 
   update(dt: number) {
-    this.bulletController?.update();
+    this.shootingController?.update();
     this.movementController?.update(dt);
 
     this.cameraController();

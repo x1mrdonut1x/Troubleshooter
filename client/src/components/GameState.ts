@@ -7,14 +7,15 @@ import * as PIXI from 'pixi.js';
 import { GameEngine } from '../../../engine/GameEngine';
 import { Rectangle } from '../../../engine/entities/Rectangle';
 import { Circle } from '../../../engine/entities/Circle';
-import { ServerEnemy } from '../../../shared/types';
+import { ServerBullet, ServerEnemy } from '../../../shared/types';
+import { Bullet } from '@/components/Bullet';
 
 export class GameState {
   private drawableEntities: Map<Rectangle | Circle, PIXI.Container> = new Map();
-  private engine: GameEngine<Player, Enemy>;
+  private engine: GameEngine<Player, Enemy, Bullet>;
 
   constructor(private stage: PIXI.Container) {
-    this.engine = new GameEngine<Player, Enemy>();
+    this.engine = new GameEngine<Player, Enemy, Bullet>();
 
     gameServer.playerConnected.on(data => {
       this.updatePlayersFromServer(data);
@@ -23,6 +24,7 @@ export class GameState {
     gameServer.getWorldState.on(data => {
       this.movePlayers(data);
       this.addEnemies(data.state.enemies);
+      this.addBullets(data.state.bullets);
     });
 
     gameServer.addEnemies.on(data => {
@@ -50,6 +52,23 @@ export class GameState {
       );
 
       this.engine.addEnemy(newEnemy);
+    });
+  }
+
+  public addBullets(bullets: ServerBullet[]) {
+    bullets.forEach(bullet => {
+      const newBullet = new Bullet(
+        bullet.position.x,
+        bullet.position.y,
+        bullet.velocity,
+        bullet.created,
+        bullet.playerId,
+        bullet.id
+      );
+      const player = this.engine.getPlayerById(bullet.playerId);
+      player?.bullets.add(newBullet);
+
+      this.engine.addBullet(newBullet);
     });
   }
 

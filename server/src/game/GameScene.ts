@@ -35,6 +35,7 @@ export class GameScene {
         state: {
           players: this.state.players,
           enemies: this.state.enemies,
+          bullets: this.state.bullets,
         },
       });
     }, SNAPSHOT_STEP);

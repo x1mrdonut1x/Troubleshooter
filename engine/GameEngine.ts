@@ -5,11 +5,17 @@ import { Circle } from './entities/Circle';
 import { Rectangle } from './entities/Rectangle';
 import { CollisionDetector } from './helpers/CollisionDetector';
 import { EntityId } from '../shared/types';
+import { Bullet } from './components/Bullet';
 
-export class GameEngine<TPlayer extends Player = Player, TEnemy extends Enemy = Enemy> {
+export class GameEngine<
+  TPlayer extends Player = Player,
+  TEnemy extends Enemy = Enemy,
+  TBullet extends Bullet = Bullet
+> {
   public entities: Map<EntityId, Rectangle | Circle> = new Map();
   public players: Map<EntityId, TPlayer> = new Map();
-  public enemies: Map<EntityId, Enemy> = new Map();
+  public enemies: Map<EntityId, TEnemy> = new Map();
+  public bullets: Map<EntityId, TBullet> = new Map();
 
   public addEntity(entity: Rectangle | Circle) {
     if (this.entities.has(entity.id)) return;
@@ -59,6 +65,20 @@ export class GameEngine<TPlayer extends Player = Player, TEnemy extends Enemy = 
     this.enemies.forEach(enemy => enemy.update(dt));
   }
 
+  // Bullets
+  public addBullet(bullet: TBullet) {
+    if (this.bullets.has(bullet.id)) return;
+
+    this.bullets.set(bullet.id, bullet);
+    this.addEntity(bullet);
+  }
+
+  public removeBullet(id: EntityId) {
+    // TODO? maybe remove bullet from player here
+    this.bullets.delete(id);
+    this.removeEntity(id);
+  }
+
   public removeInactiveEntities() {
     this.entities.forEach(entity => {
       if (
@@ -72,6 +92,8 @@ export class GameEngine<TPlayer extends Player = Player, TEnemy extends Enemy = 
           this.removeEnemy(entity.id);
         } else if (entity instanceof Player) {
           this.removePlayer(entity.id);
+        } else if (entity instanceof Bullet) {
+          this.removeBullet(entity.id);
         } else {
           this.removeEntity(entity.id);
         }

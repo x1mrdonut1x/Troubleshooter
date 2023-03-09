@@ -32,20 +32,7 @@ export class SocketController {
     });
 
     this.shoot.on(data => {
-      const foundPlayer = this.game?.state.getPlayerById(data.clientId);
-      if (!foundPlayer) return;
-
-      const output: ServerShootData = {
-        clientId: data.clientId,
-        isShooting: data.isShooting,
-        mousePos: data.mousePos,
-        playerPos: {
-          x: foundPlayer?.x,
-          y: foundPlayer.y,
-        },
-      };
-
-      this.shoot.emit(output);
+      this.game?.state.playerShoots(socket.clientId, data);
     });
   }
 

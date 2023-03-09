@@ -22,7 +22,7 @@ export type ServerShootData = {
 };
 
 export type ServerPlayer = {
-  clientId: string | number;
+  clientId: EntityId;
   position: Vector2;
   speed: number;
   bulletSpeed: number;
@@ -30,10 +30,18 @@ export type ServerPlayer = {
 };
 
 export type ServerEnemy = {
-  id: number | string;
+  id: EntityId;
   position: Vector2;
   velocity: Vector2;
   speed: number;
+};
+
+export type ServerBullet = {
+  id: EntityId;
+  position: Vector2;
+  velocity: Vector2;
+  created: number;
+  playerId: EntityId;
 };
 
 export type ServerSnapshot = {
@@ -41,6 +49,7 @@ export type ServerSnapshot = {
   state: {
     players: ServerPlayer[];
     enemies: ServerEnemy[];
+    bullets: ServerBullet[];
   };
 };
 

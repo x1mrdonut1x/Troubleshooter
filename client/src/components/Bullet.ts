@@ -7,10 +7,18 @@ import { EntityId } from '../../../shared/types';
 export class Bullet extends EngineBullet {
   public sprite?: PIXI.AnimatedSprite;
 
-  constructor(x: number, y: number, velocity: Vector2, angle: number, id: EntityId) {
-    super(x, y, velocity, id);
+  constructor(
+    x: number,
+    y: number,
+    velocity: Vector2,
+    created: number,
+    playerId: EntityId,
+    id: EntityId
+  ) {
+    super(x, y, velocity, created, playerId, id);
     this.label = 'Bullet';
 
+    const angle = Math.atan2(velocity.y, velocity.x);
     this.animate(x, y, angle);
   }
 

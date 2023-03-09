@@ -1,7 +1,14 @@
+import { Bullet } from '../../../engine/components/Bullet';
 import { Enemy } from '../../../engine/components/Enemy';
 import { Player } from '../../../engine/components/Player';
 import { GameEngine } from '../../../engine/GameEngine';
-import { ServerEnemy, ServerMovement, ServerPlayer } from '../../../shared/types';
+import {
+  ClientShootData,
+  ServerBullet,
+  ServerEnemy,
+  ServerMovement,
+  ServerPlayer,
+} from '../../../shared/types';
 import { SocketEvent } from '../../../shared/types/events';
 import { io } from '../main';
 
@@ -29,6 +36,10 @@ export class GameState {
 
   get enemies() {
     return Array.from(this.engine.enemies.values()).map(fromServerEnemy);
+  }
+
+  get bullets() {
+    return Array.from(this.engine.bullets.values()).map(fromServerBullet);
   }
 
   public getPlayerById(id: number | string) {
@@ -69,6 +80,11 @@ export class GameState {
     foundPlayer?.setVelocityFromMovement(data);
   }
 
+  public playerShoots(id: string, data: ClientShootData) {
+    const foundPlayer = this.engine.getPlayerById(id);
+    foundPlayer?.setShootingFromInput(data);
+  }
+
   public update(dt: number) {
     this.engine.update(dt);
   }
@@ -91,4 +107,14 @@ export const fromServerEnemy = (enemy: Enemy) => {
     velocity: { x: enemy.velocity.x, y: enemy.velocity.y },
     position: { x: enemy.x, y: enemy.y },
   } satisfies ServerEnemy;
+};
+
+export const fromServerBullet = (bullet: Bullet) => {
+  return {
+    id: bullet.id,
+    velocity: bullet.velocity,
+    position: { x: bullet.x, y: bullet.y },
+    created: bullet.createdTimestamp,
+    playerId: bullet.playerId,
+  } satisfies ServerBullet;
 };
